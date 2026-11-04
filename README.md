@@ -1,14 +1,17 @@
 # 项目记忆与会话交接
 
-更新日期：2026-11-03（Asia/Shanghai）
+更新日期：2026-11-04（Asia/Shanghai）
 
 ## 使用说明
 
 本仓库用于保存多个项目的上下文与会话交接记录。云电脑可能会重新安装 ChatGPT，因此下次继续时请先读本 README，再检查对应项目目录的实际文件；若记录和本地现状不一致，以本地文件为准。新增项目时，在本文档新增独立章节，不覆盖其他项目的记忆。记录需求、结论、已做修改、验证结果和待办，不记录模型内部推理。公开 README 只记录项目状态和处理过程，不写入本地账号、密码、令牌或 data 文件中的真实条目。
+## 云电脑重置提醒（重要）
+
+云电脑重置后，**Q 盘上的项目文件会保留；其他盘和用户配置均会丢失**。代码还在 Q 盘并不代表开发环境还在：Flutter/Dart、Git、Visual Studio/MSVC/Windows SDK、VS Code 与扩展、C 盘构建工具、PATH/镜像环境变量、Pub 缓存和 `C:\src` 下的项目路径 junction 都需要重新安装或创建。各项目的具体恢复步骤请阅读对应项目章节；拾光工坊的完整清单在下方“项目三：拾光工坊”，并有单独的[详细交接文件](拾光工坊项目记忆与会话交接.md)。
 
 ## 项目一：飞鱼浏览器
 
-更新日期：2026-11-03（Asia/Shanghai）
+更新日期：2026-11-04（Asia/Shanghai）
 项目位置：Q:\独立Chromium浏览器
 
 ### 项目背景
@@ -56,7 +59,7 @@
 
 ## 项目二：悬浮复制器
 
-更新日期：2026-11-03（Asia/Shanghai）
+更新日期：2026-11-04（Asia/Shanghai）
 项目位置：Q:\悬浮复制器项目
 项目状态：本轮主要功能、托盘行为、图标与 EXE 启动问题均已处理；用户确认当前可正常打开，后续可继续改进。
 
@@ -115,3 +118,41 @@ EXE 运行时仍需要同目录图标文件，数据目录也与 EXE 放在一�
 本轮确认：EXE 可以从项目目录启动并显示完整窗口；程序读取同目录的 vault.json/settings.json；托盘隐藏和恢复逻辑此前已实际验证；VBS 重复启动能唤醒现有实例；标题栏空白可拖动；复制和删除问题曾按上述路径修复；直接退出不再弹出 0。用户随后表示当前可以正常使用，本项目阶段性结束，未来可能继续改进。
 
 目前没有已知必须立即处理的待办。以后继续时，先检查 Q:\悬浮复制器项目 的实际文件、EXE 时间戳与 data 文件，再根据用户报告处理；不要假设公开 README 中有用户数据，也不要覆盖“飞鱼浏览器”章节。用户偏好中文沟通、尽量自主完成并验证、交代修复根因；如需要调托盘，务必保留左上角任务栏最小化功能。
+
+## 项目三：拾光工坊（Flutter 图片处理工具）
+
+更新日期：2026-11-04（Asia/Shanghai）  
+项目位置：`Q:\flutter做图片工具`  
+详细交接：[`拾光工坊项目记忆与会话交接.md`](拾光工坊项目记忆与会话交接.md)
+
+### 项目目标与约束
+
+用户从零学习 Flutter、Dart、Material 3，并制作一个 Windows 图片处理工具。导入图片后可按证件照规格裁剪、压缩 JPEG 画质、替换蓝/白背景并保存到默认或自选目录。当前只做 Windows，Android 暂缓。使用 Flutter Widget 与自定义 Design System；不使用 HTML/CSS/Tailwind 作为 Flutter 界面样式。后续可独立扩展 AI 清晰化、图片合并。
+
+### 已实现与验证
+
+- Windows-only Flutter 工程，应用工作名“拾光工坊”；Material 3 主题和自适应界面。
+- 单张图片导入（JPG/PNG/WebP/BMP/TIFF），一寸 295×413 px、两寸 413×579 px、方形 600×600 px 规格；预览实时显示裁剪框，滑杆调整裁剪位置。
+- JPEG 质量滑杆；默认保存到 `%USERPROFILE%\Pictures\拾光工坊`，或自选输出目录。
+- 本地 ONNX 抠图并合成蓝底/白底，可恢复原图。代码和合成图已确认运行链路；真实人像边缘质量尚未验收。
+- 处理期间禁用会改变输出设置的控件，避免文件名与实际输出不一致；修复了 360 px 窄窗口空态竖向溢出。
+- 检查结果：`flutter analyze` 无问题；图像处理 5 项测试通过；响应式 UI 检查覆盖 1440、1024、600、360、320 px 五种宽度；`flutter build windows --debug` 成功。合成图片导入/导出、蓝/白底和恢复原图均已人工走查。
+
+### 当前限制
+
+尚未实现精确目标文件大小压缩（目前只有 JPEG 质量调节）、批量图片和自由拖动裁剪框；未用真人照片评价抠图边缘，也未覆盖所有格式与 EXIF 旋转组合。具体证件照像素、300 DPI 推算、JPEG 输出和默认目录属于当前实现采用的临时默认值，尚未由用户逐项确认。
+
+### 云电脑重置后的恢复清单（重要）
+
+**重置后只有 Q 盘项目文件保留。** `Q:\flutter做图片工具` 源码和交接备忘录会留下；下列 C 盘安装、用户级配置和生成缓存都要重新恢复：
+
+1. 安装 Git for Windows（当前 2.56.0.4；原位置 `C:\Program Files\Git`），用于 GitHub 备忘录同步。
+2. 安装 Flutter stable 3.47.9（包含 Dart 3.13.7），放到 `C:\src\flutter`，将 `C:\src\flutter\bin` 加入用户 PATH。**不需要单独装 Dart。**
+3. 安装 Visual Studio Community 2022 17.14.44，选择“使用 C++ 的桌面开发”，包含 MSVC x64/x86 与 Windows SDK 10.0.26100.0。CMake 3.31.6 随 VS 提供，**不需要单独安装 CMake**。以前另外安装的 VS Build Tools 2022 是重复项，可不重装。
+4. 安装 VS Code 1.145.0，并安装 Dart、Flutter 扩展（当前均为 3.146.0）。
+5. 重新设置用户 PATH（Flutter、VS Code）及必要的 Pub 镜像环境变量。Pub 缓存、VS Code 扩展目录、Flutter 用户配置都在 C 盘/用户目录，重置后不会保留。
+6. 重建 junction：`C:\src\image_tool_workspace` → `Q:\flutter做图片工具`。项目目录含中文，Dart 分析器/LSP 与 ONNX 插件 CMake 在真实路径会出错；从英文 junction 打开 VS Code 并执行 Flutter 命令。
+7. 运行 `flutter doctor -v`、`flutter pub get`、`flutter analyze`、`flutter test test\editor_responsive_test.dart`、`flutter test test\image_export_service_test.dart`，再运行 `flutter build windows --debug` 或 `flutter run -d windows`。`.dart_tool`、Pub 缓存与 build 输出丢失后可重建。
+8. 首次构建背景抠除插件需联网下载 ONNX Runtime 1.28.3。
+
+当前没有 Android SDK 或 Android Studio；Android 仍暂缓，恢复时不需要安装 Android 工具。完整版本、路径、环境变量、修复记录和后续待办见[详细交接文件](拾光工坊项目记忆与会话交接.md)。
