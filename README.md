@@ -156,3 +156,23 @@ EXE 运行时仍需要同目录图标文件，数据目录也与 EXE 放在一�
 8. 首次构建背景抠除插件需联网下载 ONNX Runtime 1.28.3。
 
 当前没有 Android SDK 或 Android Studio；Android 仍暂缓，恢复时不需要安装 Android 工具。完整版本、路径、环境变量、修复记录和后续待办见[详细交接文件](拾光工坊项目记忆与会话交接.md)。
+
+## 拾光工坊补充记录：保存后间歇性闪退（2026-11-04）
+
+### 复现和影响范围
+
+* 用桌面上的 JPEG 人像测试。默认一寸规格下，直接保存、以及蓝底抠图后保存，都曾发生闪退；两次都先生成了 JPEG 文件（295×413 px，约 24–26 KB），之后应用进程才消失。
+* 进一步测试中，“两寸照 + 调整裁剪位置 + 保存”成功；“白底 + 调整裁剪位置 + 保存”成功，连续重复保存两次也成功。两寸输出 JPEG 约 43 KB。故障表现间歇性，尚未发现某个尺寸、裁剪或换底功能可稳定单独触发。
+
+### 最可能的故障位置
+
+保存流程位于 `lib/features/editor/editor_screen.dart` 的 `_export()`：图像处理由 `ImageExportService.createPhoto()` 完成，之后创建目标目录并调用 `File.writeAsBytes(..., flush: true)`。故障案例中，目标 JPEG 已落盘，说明图像编码和写文件步骤已成功；随后应用在保存成功后的界面更新阶段消失。Windows Application Error 事件（ID 1000）记录故障模块 `flutter_windows.dll`、异常 `0xc0000005`（访问冲突）、偏移 `0x3c1ea`；Flutter 调试输出同时反复报告 `Failed to update ui::AXTree` / 节点不在树中。没有 Dart 层可捕获异常。
+
+综合这些证据，最可能出问题的是 Flutter Windows 引擎的 **AccessibilityBridge（Windows 无障碍桥接）** 在 UI 语义树更新失败后的原生访问冲突，而不是保存函数写坏图片或目录权限错误。Flutter 上游有相似的 [Windows AccessibilityBridge 崩溃记录 #175041](https://github.com/flutter/flutter/issues/175041) 和 [AXTree 更新失败记录 #182444](https://github.com/flutter/flutter/issues/182444)。
+
+### 证据边界与后续
+
+* 桌面自动化复现会连接 Windows UI Automation；它可能触发或放大引擎问题。尚未用完全不启用 UIA/读屏客户端的真人鼠标会话确认是否同样闪退。
+* 未取得并符号化崩溃转储，因此无法确定具体是哪一个控件/语义节点先让无障碍树失效。AXTree 错误在成功保存的测试里也出现过，不代表每次都会马上崩溃。
+* 本次没有改项目代码，也没有确认应用内的临时绕过方案。后续应在普通用户操作条件下复测；如仍闪退，保存 WER 转储并按崩溃栈定位。优先等待 Flutter 稳定版引擎修复，不要未经验证就关闭整个应用的无障碍能力。
+* 详细事件记录、输出位置和恢复步骤见[拾光工坊详细交接](拾光工坊项目记忆与会话交接.md)。
