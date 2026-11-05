@@ -66,3 +66,12 @@ Cargo 网络配置 E:\DevTools\Cargo\config.toml 将 http.proxy 设为空；原�
 - Rust/Tauri：src-tauri/src/lib.rs、src-tauri/tauri.conf.json、src-tauri/capabilities/default.json
 - 项目说明与模型许可：README.md、MODEL_NOTICE.md
 - 本地详细环境清单：E:\picturework\项目交接备忘录.md
+
+
+## 2026-11-05 补充：用户手测通过与独立发布包
+
+- 用户实际打开桌面版测试后反馈“完全没有 bug”。具体测试步骤没有逐项记录；这是用户对桌面应用的验收反馈。
+- 用户同意生成 Windows 发布文件。`npm run tauri -- build --bundles nsis` 已完成，前端生产构建及 Rust release 编译通过，生成 NSIS 安装程序：`E:\picturework\shiguang-studio\src-tauri\target\release\bundle\nsis\拾光工坊_0.1.0_x64-setup.exe`，11,703,021 字节（约 11.16 MiB）。前端仍有 chunk 大于 500 KB 提示；离线 ONNX WASM 约 26.9 MB。
+- 独立发布目录：`E:\picturework\拾光工坊-v0.1.0-发布包-20261105`。包含 `拾光工坊_0.1.0_x64-setup.exe`、`shiguang-studio.exe`、`MODEL_NOTICE.md`、`使用说明.txt`；不包含源码、依赖、构建目录或开发工具。
+- 原始可编辑项目保持在 `E:\picturework\shiguang-studio`，没有移动或删除；后续改动仍在原工程进行，再重新构建发布包。构建出的 MSI 留在原项目的 target 目录，本次单独整理的交付以 NSIS `.exe` 为主。
+- 注意：只生成并检查了安装程序文件，尚未安装该 NSIS 包或在其他电脑验收安装流程。用户手动测试的是桌面应用本体。下一步可安装此 setup.exe 并确认安装、启动、卸载流程；需保留源项目供编辑。
